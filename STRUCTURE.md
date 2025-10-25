@@ -8,6 +8,8 @@ QuickAspects/
 ├── QuickAspects.lua
 ├── README.md
 ├── CHANGELOG.md
+├── STRUCTURE.md
+├── LICENSE
 └── Libs/
     └── LibDBIcon-1.0/
         ├── LibStub/
