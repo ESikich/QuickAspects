@@ -80,4 +80,4 @@ Created for World of Warcraft: Classic (Season of Discovery)
 
 ## License
 
-All rights reserved. This addon is provided as-is for personal use.
+MIT License - See LICENSE file for details
