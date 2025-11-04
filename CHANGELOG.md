@@ -2,6 +2,21 @@
 
 All notable changes to QuickAspects will be documented in this file.
 
+## [3.3.2] - 11/03/2025
+
+### Added
+- **Static Titan Panel / LDB Icon:** Added support for a permanent addon icon (`QuickAspects.tga`) used by Titan Panel and other LibDataBroker displays.
+
+### Changed
+- **Separated Icon Logic:** The minimap button icon is now fully independent from the LibDataBroker icon (Titan Panel no longer changes when Aspects switch).
+- **Improved Fallback Handling:** When an active Aspect is cancelled (such as by mounting), the minimap icon now correctly reverts to the default Aspect icon instead of persisting the last one.
+
+### Fixed
+- **Mount Cancellation Bug:** Fixed an issue where movement-based Aspects (like Cheetah or Pack) being cancelled by mounting would not visually update on the minimap button.
+- **Minor Refactor:** Cleaned up redundant icon updates and improved timer safety during aura changes.
+
+---
+
 ## [3.3.1] - 10/25/2025
 
 ### Added
@@ -27,6 +42,8 @@ All notable changes to QuickAspects will be documented in this file.
 
 ### Removed
 - Right-click hide functionality (use slash commands instead)
+
+---
 
 ## [3.3.0] - Initial Release
 
