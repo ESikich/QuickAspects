@@ -2,12 +2,13 @@
 ## Title: QuickAspects
 ## Notes: Minimap icon with radial flyout for Hunter Aspects
 ## Author: Erik Sikich
-## Version: 3.3.1
+## Version: 3.3.2
 ## SavedVariables: QuickAspectsDB
 ## OptionalDeps: LibStub, LibDataBroker-1.1, LibDBIcon-1.0
 ## X-Category: Hunter
 ## X-License: MIT
 ## X-Website: https://github.com/esikich/QuickAspects
+## X-Icon: Interface\AddOns\QuickAspects\QuickAspects.tga
 
 # Libraries (LibDBIcon includes LibStub, CallbackHandler, and LibDataBroker)
 Libs\LibDBIcon-1.0\LibStub\LibStub.lua
@@ -17,3 +18,4 @@ Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 # Core
 QuickAspects.lua
+QuickAspects.tga
