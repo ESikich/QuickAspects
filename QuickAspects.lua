@@ -110,6 +110,15 @@ local function GetMinimapButtonFrame()
 end
 
 ------------------------------------------------------------
+-- Icon paths
+------------------------------------------------------------
+-- Static icon for Titan Panel / LDB displays
+local titanPanelIcon = "Interface\\AddOns\\QuickAspects\\QuickAspects"
+
+-- Fallback icon for the MINIMAP BUTTON when no aspect is active
+local aspectIconFallback = "Interface\\AddOns\\QuickAspects\\QuickAspects"
+
+------------------------------------------------------------
 -- Timer Management
 ------------------------------------------------------------
 local timers = { pending = nil, clear = nil }
@@ -130,8 +139,6 @@ end
 ------------------------------------------------------------
 -- Aspect Detection → Minimap Icon
 ------------------------------------------------------------
-local aspectIconFallback = "Interface\\Icons\\Ability_Hunter_AspectOfTheHawk"
-
 local ASPECT_NAME_TO_ICON = {}
 local function BuildAspectNameMap()
   wipe(ASPECT_NAME_TO_ICON)
@@ -141,12 +148,8 @@ local function BuildAspectNameMap()
   end
 end
 
+-- Only changes the LibDBIcon minimap button, not the LDB object.
 local function SetMinimapIconTexture(tex)
-  local ldb = LibStub and LibStub("LibDataBroker-1.1", true)
-  if ldb then
-    local obj = ldb:GetDataObjectByName("QuickAspects")
-    if obj then obj.icon = tex or aspectIconFallback end
-  end
   local btn = GetMinimapButtonFrame()
   if btn and btn.icon then
     btn.icon:SetTexture(tex or aspectIconFallback)
@@ -195,6 +198,9 @@ local function ApplyBestIcon()
     timers.pending = C_Timer.NewTimer(0.35, ApplyBestIcon)
     return
   end
+
+  -- When no aspect buff is active anymore (e.g. cancelled by mounting),
+  -- fall back to the generic aspect icon instead of reusing lastConfirmedIcon.
   CancelTimer("clear")
   timers.clear = C_Timer.NewTimer(0.6, function()
     local again = ScanActiveAspectIcon()
@@ -202,7 +208,8 @@ local function ApplyBestIcon()
       SetMinimapIconTexture(again)
       lastConfirmedIcon = again
     else
-      SetMinimapIconTexture(lastConfirmedIcon or aspectIconFallback)
+      lastConfirmedIcon = nil
+      SetMinimapIconTexture(aspectIconFallback)
     end
   end)
 end
@@ -388,7 +395,7 @@ local function makeDataObject()
   
   local dataObj = ldb:NewDataObject("QuickAspects", {
     type = "launcher",
-    icon = aspectIconFallback,
+    icon = titanPanelIcon,  -- Titan Panel & other LDB displays use this, static
     OnClick = function(_, button)
       if button == "LeftButton" then
         EnsureFlyout()
