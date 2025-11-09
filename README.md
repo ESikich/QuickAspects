@@ -10,6 +10,7 @@ A lightweight World of Warcraft addon for WoW Classic that provides a minimap ic
 - **Smart Positioning**: Buttons arrange themselves in a radial pattern around the icon
 - **Blizzard-Style UI**: Uses the classic Blizzard tracking border for a native look
 - **Auto-Hide in Combat**: Flyout automatically closes when entering combat
+- **Combat Protection**: Prevents protected function errors when clicking during combat
 - **Configurable**: Geometry settings can be customized via saved variables
 
 ## Installation
@@ -35,6 +36,7 @@ No external downloads are required for normal use.
 - **Left-click** the minimap icon to open or close the Aspect flyout  
 - **Click any Aspect button** to cast that Aspect  
 - Flyout automatically closes after casting or when entering combat  
+- **Note**: The flyout cannot be opened during combat (a message will appear if you try)
 
 ### Slash Commands
 - `/qaspects show` — Show the minimap icon  
@@ -65,6 +67,11 @@ If an aspect icon fails to update, it will revert to the default icon until a ne
 Please report any bugs on the project page.
 
 ## Version History
+
+### 3.3.3
+- Fixed: Combat lockdown protection added to prevent protected function errors  
+- Added: Friendly error message when attempting to open flyout during combat  
+- Enhanced: Additional nil checks for improved stability  
 
 ### 3.3.2
 - Fixed: Minimap icon now correctly resets when mounting cancels a movement-based Aspect  
