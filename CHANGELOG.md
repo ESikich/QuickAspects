@@ -2,6 +2,17 @@
 
 All notable changes to QuickAspects will be documented in this file.
 
+## [3.3.4] - 11/09/2025
+
+### Fixed
+- **Tooltip Rank Display:** Tooltips now correctly show the highest rank of each aspect that the player knows, instead of always showing Rank 1. This affects multi-rank spells like Aspect of the Hawk and Aspect of the Wild.
+
+### Changed
+- Added `GetHighestRank()` function to scan the player's spellbook and identify the highest available rank for each aspect.
+- Updated `GetKnownAspects()` to use the highest rank spell ID for both casting and tooltip display.
+
+---
+
 ## [3.3.3] - 11/09/2025
 
 ### Fixed
