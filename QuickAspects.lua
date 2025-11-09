@@ -1,4 +1,4 @@
--- QuickAspects 3.3.1
+-- QuickAspects 3.3.3
 -- Minimap icon + radial flyout for Hunter Aspects (LibDataBroker / LibDBIcon)
 -- Circular icon + Blizzard "MiniMap-TrackingBorder" with scale-proof, offset-free alignment.
 -- Alignment uses intrinsic *art-space* center shifts (texture pixels), scaled at runtime.
@@ -28,6 +28,7 @@ local L = {
   USAGE = "/qaspects show | hide",
   LDB_MISSING = "LibDataBroker-1.1 missing",
   DBICON_MISSING = "LibDBIcon-1.0 not found.",
+  COMBAT_BLOCK = "Cannot open during combat",
 }
 
 ------------------------------------------------------------
@@ -398,14 +399,22 @@ local function makeDataObject()
     icon = titanPanelIcon,  -- Titan Panel & other LDB displays use this, static
     OnClick = function(_, button)
       if button == "LeftButton" then
+        -- Block interaction during combat
+        if InCombatLockdown() then
+          print("|cffff0000"..L.ADDON_NAME..":|r "..L.COMBAT_BLOCK)
+          return
+        end
+        
         EnsureFlyout()
-        if UI.flyout:IsShown() then
+        if UI.flyout and UI.flyout:IsShown() then
           UI.flyout:Hide()
           return
         end
         RebuildFlyout()
-        UI.flyout:Show()
-        LayoutRadial(GetKnownAspects())
+        if UI.flyout then
+          UI.flyout:Show()
+          LayoutRadial(GetKnownAspects())
+        end
       end
     end,
     OnTooltipShow = function(tt)
