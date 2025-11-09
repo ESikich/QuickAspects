@@ -1,4 +1,4 @@
--- QuickAspects 3.3.3
+-- QuickAspects 3.3.4
 -- Minimap icon + radial flyout for Hunter Aspects (LibDataBroker / LibDBIcon)
 -- Circular icon + Blizzard "MiniMap-TrackingBorder" with scale-proof, offset-free alignment.
 -- Alignment uses intrinsic *art-space* center shifts (texture pixels), scaled at runtime.
@@ -55,23 +55,69 @@ end
 ------------------------------------------------------------
 -- Aspect Catalog
 ------------------------------------------------------------
+-- Base spell IDs for each aspect (any rank will do for name lookup)
 local ASPECT_IDS = {
   13165,  -- Hawk
   13163,  -- Monkey
   5118,   -- Cheetah
   13159,  -- Pack
   13161,  -- Beast
-  20043,  -- Wild (R1)
+  20043,  -- Wild
 }
+
+-- Get the highest rank of a spell by name
+local function GetHighestRank(baseName)
+  local highestID, highestRank = nil, 0
+  
+  -- Scan the player's spellbook for all ranks of this spell
+  local i = 1
+  while true do
+    local spellName, spellRank = GetSpellBookItemName(i, BOOKTYPE_SPELL)
+    if not spellName then break end
+    
+    -- Check if this is our spell
+    if spellName == baseName then
+      -- Extract rank number from "Rank X" or use 1 for no rank
+      local rank = 1
+      if spellRank and spellRank:match("Rank (%d+)") then
+        rank = tonumber(spellRank:match("Rank (%d+)")) or 1
+      end
+      
+      if rank > highestRank then
+        highestRank = rank
+        -- Get the actual spell ID from this spellbook slot
+        local _, spellID = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
+        if spellID then
+          highestID = spellID
+        end
+      end
+    end
+    i = i + 1
+  end
+  
+  return highestID
+end
 
 local function GetKnownAspects()
   local known = {}
-  for _, id in ipairs(ASPECT_IDS) do
-    local name, _, icon = GetSpellInfo(id)
-    if name and icon and IsPlayerSpell(id) then
-      known[#known+1] = { id = id, name = name, icon = icon }
+  local seenNames = {} -- Prevent duplicates
+  
+  for _, baseID in ipairs(ASPECT_IDS) do
+    local name, _, icon = GetSpellInfo(baseID)
+    if name and icon and not seenNames[name] then
+      -- Find the highest rank the player knows
+      local highestID = GetHighestRank(name)
+      if highestID and IsPlayerSpell(highestID) then
+        seenNames[name] = true
+        known[#known+1] = { 
+          id = highestID,  -- Use highest rank for casting
+          name = name, 
+          icon = icon 
+        }
+      end
     end
   end
+  
   table.sort(known, function(a,b) return a.name < b.name end)
   return known
 end
