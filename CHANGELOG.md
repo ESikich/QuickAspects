@@ -2,6 +2,17 @@
 
 All notable changes to QuickAspects will be documented in this file.
 
+## [3.3.3] - 11/09/2025
+
+### Fixed
+- **Combat Lockdown Protection:** Added proper combat state check before attempting to show flyout menu. Clicking the minimap icon during combat now displays a friendly error message instead of generating a protected function error.
+- **Added nil checks:** Additional safety checks when showing/hiding the flyout to prevent edge case errors.
+
+### Changed
+- Added `COMBAT_BLOCK` localization string for the combat error message.
+
+---
+
 ## [3.3.2] - 11/03/2025
 
 ### Added
