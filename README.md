@@ -7,11 +7,6 @@ A lightweight World of Warcraft addon for WoW Classic that provides a minimap ic
 - **Minimap Icon**: Dynamically updates to show your currently active Aspect
 - **Titan Panel / LDB Support**: Displays a static addon icon (QuickAspects.tga)
 - **Radial Flyout Menu**: Click the icon to open a fan of all known Aspects
-- **Smart Positioning**: Buttons arrange themselves in a radial pattern around the icon
-- **Blizzard-Style UI**: Uses the classic Blizzard tracking border for a native look
-- **Auto-Hide in Combat**: Flyout automatically closes when entering combat
-- **Combat Protection**: Prevents protected function errors when clicking during combat
-- **Configurable**: Geometry settings can be customized via saved variables
 
 ## Installation
 
@@ -27,8 +22,6 @@ This addon requires **LibDBIcon-1.0** (included in the release), which bundles a
 - CallbackHandler-1.0  
 - LibDataBroker-1.1  
 - LibDBIcon-1.0  
-
-No external downloads are required for normal use.
 
 ## Usage
 
@@ -51,22 +44,16 @@ Advanced users can modify geometry settings in the SavedVariables file:
 - `borderThickness` — Gap between icon and border ring (default: 3)  
 - `iconInset` — Icon shrink amount (default: 6)  
 
-## Supported Aspects
-
-- Aspect of the Hawk  
-- Aspect of the Monkey  
-- Aspect of the Cheetah  
-- Aspect of the Pack  
-- Aspect of the Beast  
-- Aspect of the Wild  
-
 ## Known Issues
 
-None currently known.  
-If an aspect icon fails to update, it will revert to the default icon until a new aspect is activated.  
+None currently known.
 Please report any bugs on the project page.
 
 ## Version History
+
+### 3.3.4
+- Fixed: Tooltips now correctly display the highest rank of each aspect instead of always showing Rank 1  
+- Enhanced: Spellbook scanning to automatically detect and use the highest available rank  
 
 ### 3.3.3
 - Fixed: Combat lockdown protection added to prevent protected function errors  
