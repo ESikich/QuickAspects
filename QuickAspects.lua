@@ -1,4 +1,4 @@
--- QuickAspects 3.3.4
+-- QuickAspects 3.3.5
 -- Minimap icon + radial flyout for Hunter Aspects (LibDataBroker / LibDBIcon)
 -- Circular icon + Blizzard "MiniMap-TrackingBorder" with scale-proof, offset-free alignment.
 -- Alignment uses intrinsic *art-space* center shifts (texture pixels), scaled at runtime.
@@ -13,7 +13,7 @@ if playerClass ~= "HUNTER" then return end
 
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
-f:RegisterEvent("LEARNED_SPELL_IN_TAB")
+f:RegisterEvent("SPELLS_CHANGED")
 f:RegisterEvent("PLAYER_REGEN_ENABLED")
 f:RegisterUnitEvent("UNIT_AURA", "player")
 
@@ -63,40 +63,40 @@ local ASPECT_IDS = {
   13159,  -- Pack
   13161,  -- Beast
   20043,  -- Wild
+  34074,  -- Viper (Burning Crusade)
 }
 
 -- Get the highest rank of a spell by name
 local function GetHighestRank(baseName)
-  local highestID, highestRank = nil, 0
-  
-  -- Scan the player's spellbook for all ranks of this spell
+  local bestSpellID, bestRank, bestBookIndex = nil, 0, nil
+
   local i = 1
   while true do
     local spellName, spellRank = GetSpellBookItemName(i, BOOKTYPE_SPELL)
     if not spellName then break end
-    
-    -- Check if this is our spell
+
     if spellName == baseName then
-      -- Extract rank number from "Rank X" or use 1 for no rank
       local rank = 1
-      if spellRank and spellRank:match("Rank (%d+)") then
-        rank = tonumber(spellRank:match("Rank (%d+)")) or 1
+      if spellRank then
+        local r = spellRank:match("Rank (%d+)")
+        if r then rank = tonumber(r) or 1 end
       end
-      
-      if rank > highestRank then
-        highestRank = rank
-        -- Get the actual spell ID from this spellbook slot
+
+      if rank > bestRank then
+        bestRank = rank
+        bestBookIndex = i
+
         local _, spellID = GetSpellBookItemInfo(i, BOOKTYPE_SPELL)
-        if spellID then
-          highestID = spellID
-        end
+        bestSpellID = spellID
       end
     end
+
     i = i + 1
   end
-  
-  return highestID
+
+  return bestSpellID, bestBookIndex
 end
+
 
 local function GetKnownAspects()
   local known = {}
@@ -106,15 +106,17 @@ local function GetKnownAspects()
     local name, _, icon = GetSpellInfo(baseID)
     if name and icon and not seenNames[name] then
       -- Find the highest rank the player knows
-      local highestID = GetHighestRank(name)
-      if highestID and IsPlayerSpell(highestID) then
-        seenNames[name] = true
-        known[#known+1] = { 
-          id = highestID,  -- Use highest rank for casting
-          name = name, 
-          icon = icon 
-        }
-      end
+local highestID, bookIndex = GetHighestRank(name)
+if highestID and bookIndex and IsPlayerSpell(highestID) then
+  seenNames[name] = true
+  known[#known+1] = {
+    id = highestID,
+    name = name,
+    icon = icon,
+    bookIndex = bookIndex,
+  }
+end
+
     end
   end
   
@@ -266,7 +268,7 @@ end
 ------------------------------------------------------------
 local function EnsureFlyout()
   if UI.flyout then return UI.flyout end
-  local fly = CreateFrame("Frame", "QuickAspectsFlyout", UIParent)
+  local fly = CreateFrame("Frame", "QuickAspectsFlyout", UIParent, "SecureHandlerStateTemplate")
   UI.flyout = fly
   fly:SetFrameStrata("FULLSCREEN_DIALOG")
   fly:SetClampedToScreen(true)
@@ -282,15 +284,15 @@ local function SetupButton(b, data)
   local BTN_SIZE = QuickAspectsDB.buttonSize
   local BORDER_THICKNESS = QuickAspectsDB.borderThickness
   local ICON_INSET = QuickAspectsDB.iconInset
-  
+
   b:SetSize(BTN_SIZE, BTN_SIZE)
   b:EnableMouse(true)
+  b:Enable()
+  b:RegisterForClicks("AnyUp", "AnyDown") -- TBC may activate secure buttons on mouse down
 
-  -- ICON (circular via mask) - reuse existing textures
+  -- ICON (circular via mask)
   b.icon = b.icon or b:CreateTexture(nil, "ARTWORK")
   b.icon:ClearAllPoints()
-
-  -- Combine both knobs: ICON_OUTSET expands, ICON_INSET shrinks.
   b.icon:SetPoint("TOPLEFT",  -ICON_OUTSET + ICON_INSET,  ICON_OUTSET - ICON_INSET)
   b.icon:SetPoint("BOTTOMRIGHT", ICON_OUTSET - ICON_INSET, -ICON_OUTSET + ICON_INSET)
   b.icon:SetTexture(data.icon)
@@ -302,14 +304,13 @@ local function SetupButton(b, data)
   b.iconMask:SetSize(innerDiam, innerDiam)
   b.iconMask:SetTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMask",
                         "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-  
-  -- Only add mask once
+
   if not b.maskApplied then
     b.icon:AddMaskTexture(b.iconMask)
     b.maskApplied = true
   end
 
-  -- BLIZZARD BORDER (center-anchored; art-space shifts scaled to screen)
+  -- BLIZZARD BORDER
   local s          = BTN_SIZE / BLIZZ_BORDER_INNER
   local borderSize = math.floor(BLIZZ_BORDER_SIZE * s + 0.5)
   local ox_center  = math.floor(ART_SHIFT_X * s + 0.5) + BORDER_OFFSET_X
@@ -321,21 +322,32 @@ local function SetupButton(b, data)
   b.border:SetPoint("CENTER", b, "CENTER", ox_center, oy_center)
   b.border:SetSize(borderSize, borderSize)
 
-  -- SECURE CAST + UX
-  b:SetAttribute("type", "spell")
-  b:SetAttribute("spell", data.name)
+  -- Secure cast: bind by name and target the player
+  b:SetAttribute("unit", "player")
+  b:SetAttribute("type1", "spell")
+  b:SetAttribute("spell1", data.name)
+  b:SetAttribute("type2", "spell")
+  b:SetAttribute("spell2", data.name)
+
   b.spellID = data.id
 
+  -- TOOLTIP
   b:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:SetSpellByID(self.spellID)
     GameTooltip:Show()
   end)
   b:SetScript("OnLeave", function() GameTooltip:Hide() end)
-  b:SetScript("PostClick", function()
-    if UI.flyout and UI.flyout:IsShown() then UI.flyout:Hide() end
-  end)
+
+  -- IMPORTANT: hide flyout AFTER click action resolves (not via SecureHandlerWrapScript)
+  if not b._postClickSet then
+    b:SetScript("PostClick", function()
+      if UI.flyout then UI.flyout:Hide() end
+    end)
+    b._postClickSet = true
+  end
 end
+
 
 local function LayoutRadial(aspects)
   local BTN_SIZE = QuickAspectsDB.buttonSize
@@ -351,14 +363,23 @@ local function LayoutRadial(aspects)
   end
   
   fly:ClearAllPoints()
-  fly:SetPoint("CENTER", anchor, "CENTER")
+
+  -- Get anchor position
+  local ax, ay = anchor:GetCenter()
+  if not ax or not ay then
+    anchor = UIParent
+    ax, ay = UIParent:GetCenter()
+  end
+
+  -- Anchor to UIParent at the button's position
+  fly:SetPoint("CENTER", UIParent, "BOTTOMLEFT", ax, ay)
 
   local count = #aspects
   if count == 0 then return end
 
   -- Safety checks for positioning
   local mx, my = Minimap:GetCenter()
-  local bx, by = anchor:GetCenter()
+  local bx, by = ax, ay
   if not mx or not my or not bx or not by then
     return -- Bail out if positioning fails
   end
@@ -376,7 +397,7 @@ local function LayoutRadial(aspects)
     local b = UI.buttons[i]
     if b then
       b:ClearAllPoints()
-      b:SetPoint("CENTER", anchor, "CENTER", x, y)
+      b:SetPoint("CENTER", fly, "CENTER", x, y)
       b:Show()
     end
   end
@@ -525,7 +546,8 @@ f:SetScript("OnEvent", function(_, evt, arg1)
   elseif evt == "PLAYER_LOGIN" then
     registerIcon()
     RebuildFlyout()
-  elseif evt == "LEARNED_SPELL_IN_TAB" then
+    f:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+  elseif evt == "SPELLS_CHANGED" then
     RebuildFlyout()
   elseif evt == "PLAYER_REGEN_ENABLED" then
     if UI.pendingRebuild then
@@ -534,5 +556,12 @@ f:SetScript("OnEvent", function(_, evt, arg1)
     end
   elseif evt == "UNIT_AURA" and arg1 == "player" then
     ApplyBestIcon()
+  elseif evt == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player" then
+    -- Auto-hide flyout when a spell is cast
+    if UI.flyout and UI.flyout:IsShown() then
+      C_Timer.After(0.1, function()
+        if UI.flyout then UI.flyout:Hide() end
+      end)
+    end
   end
 end)

@@ -6,6 +6,7 @@ The addon should have the following structure:
 QuickAspects/
 ├── QuickAspects.toc
 ├── QuickAspects.lua
+├── QuickAspects.tga
 ├── README.md
 ├── CHANGELOG.md
 ├── STRUCTURE.md
@@ -47,7 +48,7 @@ LibDBIcon includes all required dependencies:
 
 ## Notes
 
-- The Interface version in the TOC (30403) is for WotLK 3.3.5a
+- The Interface versions in the TOC (11509, 20506) target Classic Era 1.15.9 and Burning Crusade Classic Anniversary 2.5.6
 - LibDBIcon bundles all its dependencies, so only one download is needed
 - End users extract the zip to their `Interface/AddOns/` folder
 - The folder MUST be named `QuickAspects` (matching the TOC filename)

@@ -1,6 +1,6 @@
 # QuickAspects
 
-A lightweight World of Warcraft addon for WoW Classic that provides a minimap icon with a radial flyout menu for quick access to Hunter Aspects.
+A lightweight World of Warcraft addon for Classic Era and Burning Crusade Classic Anniversary that provides a minimap icon with a radial flyout menu for quick access to Hunter Aspects.
 
 ## Features
 
@@ -11,7 +11,7 @@ A lightweight World of Warcraft addon for WoW Classic that provides a minimap ic
 ## Installation
 
 1. Download the addon  
-2. Extract to `World of Warcraft/_classic_era_/Interface/AddOns/`  
+2. Extract to `World of Warcraft/_classic_era_/Interface/AddOns/` for Classic Era or `World of Warcraft/_anniversary_/Interface/AddOns/` for Burning Crusade Classic Anniversary
 3. Ensure the folder is named `QuickAspects`  
 4. Restart WoW or reload UI (`/reload`)
 
@@ -51,6 +51,11 @@ Please report any bugs on the project page.
 
 ## Version History
 
+### 3.3.5
+- Fixed: Aspect buttons cast correctly in Burning Crusade Classic Anniversary
+- Updated: Interface metadata for Classic Era 1.15.9 and Burning Crusade Classic Anniversary 2.5.6
+- Added: Aspect of the Viper appears when known in Burning Crusade Classic Anniversary
+
 ### 3.3.4
 - Fixed: Tooltips now correctly display the highest rank of each aspect instead of always showing Rank 1  
 - Enhanced: Spellbook scanning to automatically detect and use the highest available rank  
@@ -76,7 +81,7 @@ Please report any bugs on the project page.
 
 ## Credits
 
-Created for World of Warcraft: Classic Era / Season of Discovery  
+Created for World of Warcraft: Classic Era / Season of Discovery / Burning Crusade Classic Anniversary
 Maintained by the community with love for Hunters everywhere.  
 
 ## License

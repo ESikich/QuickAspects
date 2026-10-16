@@ -2,6 +2,18 @@
 
 All notable changes to QuickAspects will be documented in this file.
 
+## [3.3.5] - 10/15/2026
+
+### Fixed
+- Aspect buttons now register both mouse press and release so casts work in Burning Crusade Classic Anniversary.
+- Updated the addon interface metadata for Classic Era 1.15.9 and Burning Crusade Classic Anniversary 2.5.6.
+
+### Changed
+- Included the TBC-compatible secure button and flyout handling used by the working Anniversary installation.
+- Added Aspect of the Viper to the picker when the hunter knows it.
+
+---
+
 ## [3.3.4] - 11/09/2025
 
 ### Fixed
