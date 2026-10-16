@@ -1,4 +1,4 @@
--- QuickAspects 3.3.5
+-- QuickAspects 3.3.6
 -- Minimap icon + radial flyout for Hunter Aspects (LibDataBroker / LibDBIcon)
 -- Circular icon + Blizzard "MiniMap-TrackingBorder" with scale-proof, offset-free alignment.
 -- Alignment uses intrinsic *art-space* center shifts (texture pixels), scaled at runtime.

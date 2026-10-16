@@ -51,6 +51,10 @@ Please report any bugs on the project page.
 
 ## Version History
 
+### 3.3.6
+- Fixed: Bundled LibDBIcon loads from the correct path
+- Fixed: Removed the image asset from the TOC load list
+
 ### 3.3.5
 - Fixed: Aspect buttons cast correctly in Burning Crusade Classic Anniversary
 - Updated: Interface metadata for Classic Era 1.15.9 and Burning Crusade Classic Anniversary 2.5.6

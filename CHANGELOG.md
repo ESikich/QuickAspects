@@ -2,6 +2,14 @@
 
 All notable changes to QuickAspects will be documented in this file.
 
+## [3.3.6] - 10/15/2026
+
+### Fixed
+- Corrected the bundled LibDBIcon path in the TOC so the library loads.
+- Removed the image asset from the TOC load list. The icon remains available through its file path and metadata.
+
+---
+
 ## [3.3.5] - 10/15/2026
 
 ### Fixed
